@@ -93,3 +93,39 @@ test('SHOWCASES_OFFLINE=1 skips the call', async () => {
   assert.equal(called, false);
   assert.equal(got.source, 'saved');
 });
+
+const quiet = { warn: () => {} };
+
+test('falls back to the saved copy when a live description fails the copy check', async () => {
+  for (const description of ['Fast — and cheap.', 'It works!', 'A robust list check.']) {
+    const fetchImpl = async () => ({ ok: true, json: async () => [repo({ description })] });
+    const got = await loadShowcases({ fetchImpl, fallback, log: quiet, words: ['robust'] });
+    assert.equal(got.source, 'saved', description);
+    assert.deepEqual(got.repos, fallback);
+  }
+});
+
+test('falls back to the saved copy when a live description fails the privacy check', async () => {
+  for (const description of [`Mail ops${'@'}example.com for access.`, `Set api${'_'}key=abc123def456 first.`]) {
+    const fetchImpl = async () => ({ ok: true, json: async () => [repo({ description })] });
+    const got = await loadShowcases({ fetchImpl, fallback, log: quiet, words: [] });
+    assert.equal(got.source, 'saved', description);
+  }
+});
+
+test('says why on every fallback', async () => {
+  const lines = [];
+  const log = { warn: (m) => lines.push(m) };
+  await loadShowcases({ fetchImpl: async () => ({ ok: false, status: 403 }), fallback, log, words: [] });
+  await loadShowcases({ fetchImpl: async () => { throw new Error('offline'); }, fallback, log, words: [] });
+  await loadShowcases({
+    fetchImpl: async () => ({ ok: true, json: async () => [repo({ description: 'It works!' })] }),
+    fallback,
+    log,
+    words: [],
+  });
+  assert.equal(lines.length, 3);
+  assert.match(lines[0], /403/);
+  assert.match(lines[1], /offline/);
+  assert.match(lines[2], /list-gate.*exclamation mark/);
+});
