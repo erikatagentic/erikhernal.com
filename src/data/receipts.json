@@ -1,18 +1,18 @@
 [
   {
     "position": "1/4",
-    "rendered_at": "2026-11-25T12:51:25Z",
-    "channel": "static page on Vercel, commit b7571fa, no open pixel, no tracking links",
+    "rendered_at": "2026-11-25T18:12:53Z",
+    "channel": "static page on Vercel, commit 3d36991, no open pixel, no tracking links",
     "reply_to": "erik@erikhernal.com",
     "reply_to_check": {
       "mx": true,
       "spf": true,
       "dmarc": false,
       "smtp_rcpt": "untested (ETIMEDOUT)",
-      "probed_at": "2026-11-25T12:51:25Z",
+      "probed_at": "2026-11-25T18:12:53Z",
       "method": "MX, SPF and DMARC via DNS, RCPT TO on aspmx.l.google.com over port 25"
     },
-    "ledger": "{\n  \"ts\": \"2026-11-25T12:51:25Z\",\n  \"action\": \"rendered\",\n  \"domain\": \"erikhernal.com\",\n  \"email\": \"erik@erikhernal.com\",\n  \"campaign\": \"erikhernal.com\",\n  \"batch\": \"p11-sequence\",\n  \"position\": \"1/4\",\n  \"delay_days\": 0\n}",
+    "ledger": "{\n  \"ts\": \"2026-11-25T18:12:53Z\",\n  \"action\": \"rendered\",\n  \"domain\": \"erikhernal.com\",\n  \"email\": \"erik@erikhernal.com\",\n  \"campaign\": \"erikhernal.com\",\n  \"batch\": \"p11-sequence\",\n  \"position\": \"1/4\",\n  \"delay_days\": 0\n}",
     "words": 47,
     "lint": {
       "em_dash": 0,
@@ -24,18 +24,18 @@
   },
   {
     "position": "2/4",
-    "rendered_at": "2026-11-25T12:51:25Z",
-    "channel": "static page on Vercel, commit b7571fa, no open pixel, no tracking links",
+    "rendered_at": "2026-11-25T18:12:53Z",
+    "channel": "static page on Vercel, commit 3d36991, no open pixel, no tracking links",
     "reply_to": "erik@erikhernal.com",
     "reply_to_check": {
       "mx": true,
       "spf": true,
       "dmarc": false,
       "smtp_rcpt": "untested (ETIMEDOUT)",
-      "probed_at": "2026-11-25T12:51:25Z",
+      "probed_at": "2026-11-25T18:12:53Z",
       "method": "MX, SPF and DMARC via DNS, RCPT TO on aspmx.l.google.com over port 25"
     },
-    "ledger": "{\n  \"ts\": \"2026-11-25T12:51:25Z\",\n  \"action\": \"rendered\",\n  \"domain\": \"erikhernal.com\",\n  \"email\": \"erik@erikhernal.com\",\n  \"campaign\": \"erikhernal.com\",\n  \"batch\": \"p11-sequence\",\n  \"position\": \"2/4\",\n  \"delay_days\": 3\n}",
+    "ledger": "{\n  \"ts\": \"2026-11-25T18:12:53Z\",\n  \"action\": \"rendered\",\n  \"domain\": \"erikhernal.com\",\n  \"email\": \"erik@erikhernal.com\",\n  \"campaign\": \"erikhernal.com\",\n  \"batch\": \"p11-sequence\",\n  \"position\": \"2/4\",\n  \"delay_days\": 3\n}",
     "words": 43,
     "lint": {
       "em_dash": 0,
@@ -47,18 +47,18 @@
   },
   {
     "position": "3/4",
-    "rendered_at": "2026-11-25T12:51:25Z",
-    "channel": "static page on Vercel, commit b7571fa, no open pixel, no tracking links",
+    "rendered_at": "2026-11-25T18:12:53Z",
+    "channel": "static page on Vercel, commit 3d36991, no open pixel, no tracking links",
     "reply_to": "erik@erikhernal.com",
     "reply_to_check": {
       "mx": true,
       "spf": true,
       "dmarc": false,
       "smtp_rcpt": "untested (ETIMEDOUT)",
-      "probed_at": "2026-11-25T12:51:25Z",
+      "probed_at": "2026-11-25T18:12:53Z",
       "method": "MX, SPF and DMARC via DNS, RCPT TO on aspmx.l.google.com over port 25"
     },
-    "ledger": "{\n  \"ts\": \"2026-11-25T12:51:25Z\",\n  \"action\": \"rendered\",\n  \"domain\": \"erikhernal.com\",\n  \"email\": \"erik@erikhernal.com\",\n  \"campaign\": \"erikhernal.com\",\n  \"batch\": \"p11-sequence\",\n  \"position\": \"3/4\",\n  \"delay_days\": 7\n}",
+    "ledger": "{\n  \"ts\": \"2026-11-25T18:12:53Z\",\n  \"action\": \"rendered\",\n  \"domain\": \"erikhernal.com\",\n  \"email\": \"erik@erikhernal.com\",\n  \"campaign\": \"erikhernal.com\",\n  \"batch\": \"p11-sequence\",\n  \"position\": \"3/4\",\n  \"delay_days\": 7\n}",
     "words": 49,
     "lint": {
       "em_dash": 0,
@@ -70,19 +70,19 @@
   },
   {
     "position": "4/4",
-    "rendered_at": "2026-11-25T12:51:25Z",
-    "channel": "static page on Vercel, commit b7571fa, no open pixel, no tracking links",
+    "rendered_at": "2026-11-25T18:12:53Z",
+    "channel": "static page on Vercel, commit 3d36991, no open pixel, no tracking links",
     "reply_to": "erik@erikhernal.com",
     "reply_to_check": {
       "mx": true,
       "spf": true,
       "dmarc": false,
       "smtp_rcpt": "untested (ETIMEDOUT)",
-      "probed_at": "2026-11-25T12:51:25Z",
+      "probed_at": "2026-11-25T18:12:53Z",
       "method": "MX, SPF and DMARC via DNS, RCPT TO on aspmx.l.google.com over port 25"
     },
-    "ledger": "{\n  \"ts\": \"2026-11-25T12:51:25Z\",\n  \"action\": \"rendered\",\n  \"domain\": \"erikhernal.com\",\n  \"email\": \"erik@erikhernal.com\",\n  \"campaign\": \"erikhernal.com\",\n  \"batch\": \"p11-sequence\",\n  \"position\": \"4/4\",\n  \"delay_days\": 12\n}",
-    "words": 41,
+    "ledger": "{\n  \"ts\": \"2026-11-25T18:12:53Z\",\n  \"action\": \"rendered\",\n  \"domain\": \"erikhernal.com\",\n  \"email\": \"erik@erikhernal.com\",\n  \"campaign\": \"erikhernal.com\",\n  \"batch\": \"p11-sequence\",\n  \"position\": \"4/4\",\n  \"delay_days\": 12\n}",
+    "words": 42,
     "lint": {
       "em_dash": 0,
       "banned_words": 0,
