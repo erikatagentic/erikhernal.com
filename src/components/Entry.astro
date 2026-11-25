@@ -1,0 +1,212 @@
+---
+import Struck from './Struck.astro';
+import { formatDate, isoDay } from '../lib/dates';
+
+interface Props {
+  slug: string;
+  page: number;
+  date: Date;
+  title: string;
+  struck: { was: string; now: string; label: string };
+  one_line: string;
+  fast: string;
+  variant?: 'lead' | 'mini' | 'next';
+}
+
+const { slug, page, date, title, struck, one_line, fast, variant = 'lead' } = Astro.props;
+const longDate = formatDate(date);
+const isoDate = isoDay(date);
+const href = `/work/${slug}/`;
+const hasAside = Astro.slots.has('aside');
+const cut = title.lastIndexOf(' ');
+const titleHead = cut < 0 ? '' : title.slice(0, cut + 1);
+const titleLast = cut < 0 ? title : title.slice(cut + 1);
+---
+
+{
+  variant === 'lead' && (
+    <article class:list={['entry', { 'entry--aside': hasAside }]} data-entry>
+      <div class="entry-main">
+        <h2 class="entry-title">
+          <a href={href} data-slug={slug}>
+            {title}
+          </a>
+        </h2>
+        <p class="date">
+          <time datetime={isoDate}>{longDate}</time>
+          <span class="pg">p. {page}</span>
+        </p>
+        <Struck was={struck.was} now={struck.now} label={struck.label} />
+        <p class="entry-line">{one_line}</p>
+        {!hasAside && <p class="fast">fast version: {fast}</p>}
+      </div>
+      {hasAside && (
+        <div class="entry-aside">
+          <slot name="aside" />
+          <p class="fast">fast version: {fast}</p>
+        </div>
+      )}
+    </article>
+  )
+}
+{
+  variant === 'mini' && (
+    <article class="entry-mini" data-entry>
+      <h2 class="entry-mini-title">
+        <a href={href} data-slug={slug}>
+          {title}
+        </a>
+      </h2>
+      <p class="entry-mini-date">
+        <time datetime={isoDate}>{longDate}</time>
+        <span class="pg">p. {page}</span>
+      </p>
+      <Struck was={struck.was} now={struck.now} label={struck.label} size="sm" />
+      <p class="entry-mini-line">{one_line}</p>
+      <p class="fast fast--sm">fast version: {fast}</p>
+    </article>
+  )
+}
+{
+  variant === 'next' && (
+    <article class="entry-mini entry-next" data-entry>
+      <h2 class="entry-mini-title">
+        <span class="next-lead">Next:</span>{' '}
+        <a href={href} data-slug={slug}>
+          {titleHead}<span class="keep"
+            >{titleLast}<span class="keep-tick"></span><span class="pg">p. {page}</span></span
+          >
+        </a>
+      </h2>
+      <Struck was={struck.was} now={struck.now} label={struck.label} size="sm" />
+    </article>
+  )
+}
+
+<style>
+  .entry {
+    position: relative;
+    margin-top: 96px;
+    scroll-margin-top: var(--g);
+  }
+
+  .entry--aside {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 312px;
+    gap: 48px;
+    align-items: start;
+  }
+
+  /* the date is a note in the left margin, level with the title */
+  .entry .date {
+    top: 6px;
+    margin: 0;
+  }
+
+  .entry-main {
+    min-width: 0;
+  }
+
+  .entry-title {
+    max-width: 22ch;
+    font-weight: 420;
+    letter-spacing: -0.02em;
+  }
+
+  .entry-title a,
+  .entry-mini-title a {
+    text-decoration: none;
+  }
+
+  .entry-title a:hover,
+  .entry-mini-title a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--ink-soft);
+  }
+
+  .entry-line {
+    max-width: 58ch;
+  }
+
+  .entry-aside {
+    min-width: 0;
+    padding-top: 8px;
+  }
+
+  .entry-mini {
+    min-width: 0;
+  }
+
+  .entry-mini-title {
+    margin: 0;
+    font: 420 23px/1.2 var(--serif);
+    letter-spacing: -0.02em;
+  }
+
+  .entry-mini-date {
+    margin: 8px 0 0;
+    font: 500 12px/1.4 var(--narrow);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .entry-mini .pg {
+    margin-left: 8px;
+    font: 400 22px/1 var(--pen);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--red);
+  }
+
+  .entry-mini-line {
+    margin-top: 12px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .entry-next .entry-mini-title {
+    max-width: 36ch;
+    font-size: 28px;
+  }
+
+  .entry-next .entry-mini-title .pg {
+    font-size: 26px;
+  }
+
+  .next-lead {
+    font: 700 15px/1 var(--narrow);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    vertical-align: 0.3em;
+  }
+
+  .fast--sm {
+    margin-top: 14px;
+    font-size: 24px;
+  }
+
+  @media (max-width: 720px) {
+    .entry {
+      margin-top: 64px;
+    }
+
+    .entry--aside {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    .entry .date {
+      margin-top: 8px;
+    }
+
+    .entry-aside {
+      padding-top: 0;
+    }
+
+    .entry-next .entry-mini-title {
+      font-size: 24px;
+    }
+  }
+</style>

@@ -1,0 +1,107 @@
+---
+import Slip from './Slip.astro';
+import { formatDateTimeUTC } from '../lib/dates';
+
+interface Props {
+  receipt: {
+    position: string;
+    reply_to: string;
+    reply_to_check: {
+      mx: boolean;
+      spf: boolean;
+      dmarc: boolean;
+      smtp_rcpt: string;
+      probed_at: string;
+      method?: string;
+    };
+    words: number;
+    lint: {
+      em_dash: number;
+      banned_words: number;
+      questions: number;
+      exclamations: number;
+    };
+  };
+  showMethod?: boolean;
+  tilt?: 'left' | 'right' | 'none';
+}
+
+const { receipt, showMethod = false, tilt = 'left' } = Astro.props;
+const check = receipt.reply_to_check;
+const yesNo = (v: boolean) => (v ? 'yes' : 'no');
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+const copyCheck = [
+  count(receipt.lint.em_dash, 'em dash', 'em dashes'),
+  count(receipt.lint.banned_words, 'banned word', 'banned words'),
+  count(receipt.lint.exclamations, 'exclamation mark', 'exclamation marks'),
+  count(receipt.lint.questions, 'question', 'questions'),
+].join(', ');
+const probedText = formatDateTimeUTC(check.probed_at);
+---
+
+<Slip title={`Receipt, email ${receipt.position}`} tilt={tilt} class="receipt">
+  <table class="receipt-table">
+    <tbody>
+      <tr><th scope="row">Reply-to address</th><td class="receipt-addr">{receipt.reply_to}</td></tr>
+      <tr><th scope="row">MX record</th><td>{yesNo(check.mx)}</td></tr>
+      <tr><th scope="row">SPF</th><td>{yesNo(check.spf)}</td></tr>
+      <tr><th scope="row">DMARC</th><td>{yesNo(check.dmarc)}</td></tr>
+      <tr><th scope="row">Mail server answer</th><td>{check.smtp_rcpt}</td></tr>
+      <tr><th scope="row">Word count</th><td>{receipt.words}</td></tr>
+      <tr>
+        <th scope="row">Copy check</th>
+        <td>
+          {copyCheck}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="receipt-probed">checked <time datetime={check.probed_at}>{probedText}</time></p>
+  {showMethod && check.method && <p class="receipt-method">method: {check.method}</p>}
+</Slip>
+
+<style>
+  .receipt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .receipt-table th,
+  .receipt-table td {
+    padding: 5px 0;
+    border-bottom: 1px dotted var(--grid-strong);
+    vertical-align: baseline;
+  }
+
+  .receipt-table th {
+    width: 42%;
+    padding-right: 12px;
+    text-align: left;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .receipt-table td {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .receipt-probed,
+  .receipt-method {
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: var(--ink-soft);
+    overflow-wrap: anywhere;
+  }
+
+  .receipt-method {
+    font: 400 11.5px/1.6 var(--mono);
+  }
+
+  @media (max-width: 720px) {
+    .receipt-table th {
+      width: 46%;
+    }
+  }
+</style>

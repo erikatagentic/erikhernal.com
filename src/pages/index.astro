@@ -1,0 +1,393 @@
+---
+import { getCollection } from 'astro:content';
+import Notebook from '../layouts/Notebook.astro';
+import Entry from '../components/Entry.astro';
+import Slip from '../components/Slip.astro';
+import career from '../data/career.json';
+import results from '../data/results.json';
+import testimonials from '../data/testimonials.json';
+import { isTimestamp, toSeconds } from '../lib/timestamps.mjs';
+
+const work = (await getCollection('work')).sort((a, b) => a.data.page - b.data.page);
+const lead = work.find((e) => e.data.slug === 'reply-rate') ?? work[0];
+const rest = work.filter((e) => e !== lead);
+
+const replyTally = [
+  ['Out of office', 18],
+  ['Not a fit', 8],
+  ['Bounce', 3],
+  ['Unsubscribe', 1],
+  ['Other', 1],
+  ['A person saying yes', 0],
+] as const;
+
+const mailto = 'mailto:erik@erikhernal.com?subject=Hiring%20a%20GTM%20engineer';
+
+for (const row of testimonials.rows) {
+  if (!isTimestamp(row.at)) {
+    throw new Error(
+      `testimonials.json: "at" for ${row.name} is "${row.at}". It must look like m:ss, for example 3:49.`,
+    );
+  }
+}
+
+// Each quote slip sits a little differently, fixed by its position so the
+// page renders the same every time.
+// Quotes sit in two staggered columns; with an odd count the last one is
+// centred under both so neither column ends with a slip beside empty paper.
+const quoteRows = testimonials.rows.map((row, i) => ({ row, i }));
+const quoteTail = quoteRows.length % 2 === 1 ? quoteRows[quoteRows.length - 1] : undefined;
+const quotePairs = quoteTail ? quoteRows.slice(0, -1) : quoteRows;
+const quoteGroups = [
+  { cls: 'quotes-col', items: quotePairs.filter((_, k) => k % 2 === 0) },
+  { cls: 'quotes-col quotes-col--late', items: quotePairs.filter((_, k) => k % 2 === 1) },
+  ...(quoteTail ? [{ cls: 'quotes-tail', items: [quoteTail] }] : []),
+];
+
+const slipLooks = [
+  { angle: -1.1, tapes: { left: -14, leftTurn: -12, right: 26, rightTurn: 6 } },
+  { angle: 0.8, tapes: { left: 30, leftTurn: -4, right: -16, rightTurn: 14 } },
+  { angle: -0.4, tapes: { left: -18, leftTurn: -16, right: -12, rightTurn: 9 } },
+  { angle: 1.3, tapes: { left: 8, leftTurn: -8, right: 40, rightTurn: 3 } },
+  { angle: -0.8, tapes: { left: 44, leftTurn: 5, right: -20, rightTurn: 16 } },
+];
+const byline = (row: { name: string; title: string; company: string }) =>
+  [row.name, row.title, row.company].filter((part) => part && part.trim()).join(', ');
+---
+
+<Notebook
+  title="Erik Hernal, GTM Engineer"
+  description="I write the message, build what sends it, then check my own numbers. Dated entries from seven years in outbound, each with the number that moved and the file it came from."
+  page={1}
+>
+  <h1>I write the message, build what sends it, then check my own numbers.</h1>
+  <p class="lede">
+    I've spent seven years in outbound, from Head of Growth at Cleverly to the agency I co-own.
+    These are dated entries from the work, each with the number that moved and the file it came
+    from.
+  </p>
+  <div class="actions">
+    <a href={mailto}>Email me</a>
+    <a href="/erik-hernal-resume.pdf">Resume, PDF</a>
+  </div>
+
+  <section id="entries" class="home-entries" aria-label="Entries">
+    <Entry
+      slug={lead.data.slug}
+      page={lead.data.page}
+      date={lead.data.date}
+      title={lead.data.title}
+      struck={lead.data.struck}
+      one_line={lead.data.one_line}
+      fast={lead.data.fast}
+    >
+      <Slip slot="aside" title="Taped in: every reply, classified">
+        <table class="tally">
+          <tbody>
+            {
+              replyTally.map(([label, n]) => (
+                <tr>
+                  <th scope="row">{label}</th>
+                  <td>{n}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <p class="tally-src">replies-c339-2026-08-23.json, 31 rows</p>
+      </Slip>
+    </Entry>
+
+    <div class="home-mini">
+      {
+        rest.map((e) => (
+          <Entry
+            variant="mini"
+            slug={e.data.slug}
+            page={e.data.page}
+            date={e.data.date}
+            title={e.data.title}
+            struck={e.data.struck}
+            one_line={e.data.one_line}
+            fast={e.data.fast}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <section id="record" class="sheet-section" aria-labelledby="record-h">
+    <h2 id="record-h">Record</h2>
+    <p>Where I've worked, from my resume.</p>
+    <ol class="ruled">
+      {
+        career.roles.map((role) => (
+          <li>
+            <span class="company">{role.company}</span>
+            <span class="role">{role.title}</span>
+            <span class="when">
+              {role.from} to {role.to}
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+
+    <h3 class="home-sub">Figures from my resume</h3>
+    <p class="measure">
+      These are as stated on my resume. Unlike the entries above, I didn't re-measure them for this
+      site.
+    </p>
+    <table class="table-ruled">
+      <thead>
+        <tr>
+          <th scope="col">Where</th>
+          <th scope="col">Claim</th>
+          <th scope="col" class="fig">Figure</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          results.rows.map((row) => (
+            <tr>
+              <td class="where">{row.where}</td>
+              <td class="claim">{row.claim}</td>
+              <td class="fig">
+                {row.from ? (
+                  <>
+                    <span class="from">{row.from}</span> to <b>{row.to}</b>
+                  </>
+                ) : (
+                  <b>{row.to}</b>
+                )}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section id="clients" class="sheet-section" aria-labelledby="clients-h">
+    <h2 id="clients-h">What clients said</h2>
+    <p>
+      Clients of Lumos, the agency I co-own, on video. Each quote is word for word, with the minute
+      it's said.
+    </p>
+    <div class="quotes">
+      {
+        quoteGroups.map((group) => (
+          <ul class={group.cls}>
+            {group.items.map(({ row, i }) => (
+              <Slip
+                as="li"
+                tilt="custom"
+                angle={slipLooks[i % slipLooks.length].angle}
+                tapes={slipLooks[i % slipLooks.length].tapes}
+                class="quote"
+              >
+                <blockquote>
+                  <p>{row.quote}</p>
+                </blockquote>
+                <p class="quote-who">{byline(row)}</p>
+                <p class="quote-watch">
+                  <a href={`https://www.youtube.com/watch?v=${row.video}&t=${toSeconds(row.at)}s`}>
+                    Watch at {row.at}
+                  </a>
+                </p>
+              </Slip>
+            ))}
+          </ul>
+        ))
+      }
+    </div>
+  </section>
+
+  <section id="contact" class="sheet-section home-contact" aria-labelledby="contact-h">
+    <p class="signed">Signed: Erik Hernal</p>
+    <h2 id="contact-h">Witnessed by</h2>
+    <p>If you're hiring a GTM engineer, this is the line to sign.</p>
+    <ul class="contact-links actions">
+      <li><a href={mailto}>erik@erikhernal.com</a></li>
+      <li><a href="/erik-hernal-resume.pdf">Resume, PDF</a></li>
+      <li><a href="https://linkedin.com/in/erikhernal/">LinkedIn</a></li>
+    </ul>
+    <p class="small built-link"><a href="/built/">How this site is made</a></p>
+  </section>
+</Notebook>
+
+<style is:global>
+  .home-entries {
+    scroll-margin-top: var(--g);
+  }
+
+  .tally {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tally th,
+  .tally td {
+    padding: 4px 0;
+    border-bottom: 1px dotted var(--grid-strong);
+  }
+
+  .tally th {
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .tally td {
+    text-align: right;
+    font-weight: 700;
+  }
+
+  .tally-src {
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: var(--ink-soft);
+    overflow-wrap: anywhere;
+  }
+
+  .home-mini {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 48px;
+    margin-top: 72px;
+    padding-top: 20px;
+    border-top: 2px solid var(--ink);
+  }
+
+  .home-sub {
+    margin-top: 72px;
+    font-size: 26px;
+  }
+
+  /* two staggered columns, the second starting two grid rows lower, and an odd
+     last slip centred under both: each slip sizes to its own quote */
+  .quotes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 48px;
+    align-items: start;
+    margin: 16px 0 0;
+    padding-top: 24px;
+  }
+
+  .quotes-col,
+  .quotes-tail {
+    display: grid;
+    gap: 48px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .quotes-col--late {
+    margin-top: 48px;
+  }
+
+  .quotes-tail {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(100%, 576px);
+    margin-top: 48px;
+  }
+
+  .quotes .quote.slip {
+    margin: 0;
+  }
+
+  .quote blockquote {
+    margin: 0;
+  }
+
+  .quote blockquote p {
+    margin: 0;
+    font: 400 19px/1.5 var(--serif);
+  }
+
+  .quote blockquote p::before {
+    content: '\201C';
+  }
+
+  .quote blockquote p::after {
+    content: '\201D';
+  }
+
+  .quote-who {
+    margin-top: 12px;
+    font: 600 14px/1.4 var(--narrow);
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+  }
+
+  .quote-watch {
+    margin-top: 6px;
+    font: 700 14px/1.4 var(--narrow);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .home-contact {
+    max-width: 624px;
+  }
+
+  .signed {
+    margin: 0 0 48px;
+    padding: 0 0 4px;
+    border-bottom: 2px solid var(--ink);
+    font: 400 44px/1.1 var(--pen);
+    color: var(--ink);
+  }
+
+  .home-contact > h2 {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .contact-links {
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+
+  .built-link {
+    margin-top: 48px;
+  }
+
+  @media (max-width: 1000px) {
+    .home-mini {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 48px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .home-mini {
+      margin-top: 56px;
+    }
+
+    .quotes {
+      grid-template-columns: minmax(0, 1fr);
+      padding-top: 16px;
+    }
+
+    .quotes-col--late,
+    .quotes-tail {
+      margin-top: 40px;
+    }
+
+    .quotes-col,
+    .quotes-tail {
+      gap: 40px;
+    }
+
+    .signed {
+      font-size: 38px;
+    }
+  }
+</style>

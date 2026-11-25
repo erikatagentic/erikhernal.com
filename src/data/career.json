@@ -1,0 +1,12 @@
+{
+  "source": "Erik's resume facts file, read 2026-11-25",
+  "roles": [
+    { "company": "Agentic", "title": "Founder and GTM engineer", "from": "Sep 2024", "to": "now" },
+    { "company": "Lumos", "title": "Co-founder", "from": "Sep 2023", "to": "now" },
+    { "company": "Medely", "title": "Senior product manager", "from": "Aug 2022", "to": "Aug 2023" },
+    { "company": "Cleverly", "title": "Head of growth", "from": "Jun 2019", "to": "Jul 2022" },
+    { "company": "Honey", "title": "Product marketing", "from": "Jun 2018", "to": "May 2019" },
+    { "company": "GrowthPhysics", "title": "Product manager", "from": "Apr 2018", "to": "Aug 2019" }
+  ],
+  "education": "Syracuse University, B.S. Health and Exercise Science, 2018"
+}

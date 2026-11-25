@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install pdftotext for the private check
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pnpm test
+      - run: pnpm exec astro build
+      - run: pnpm lint:copy
+      - run: pnpm check:private
+      - run: pnpm check:links

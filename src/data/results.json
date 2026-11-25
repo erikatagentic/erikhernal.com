@@ -1,0 +1,16 @@
+{
+  "note": "Figures as stated on Erik's resume. These were not re-measured for this site, unlike the four case files.",
+  "rows": [
+    { "where": "Agentic", "claim": "Valid email rate from a 4-provider Clay waterfall", "from": "34%", "to": "68%" },
+    { "where": "Agentic", "claim": "Time to launch a client campaign", "from": "4 hours", "to": "15 minutes" },
+    { "where": "Agentic", "claim": "Reply rate after rebuilding signal-based outbound for an 80-person B2B SaaS", "from": "0.8%", "to": "4.7%" },
+    { "where": "Agentic", "claim": "Meetings a month for that client", "from": "2", "to": "14" },
+    { "where": "Agentic", "claim": "Meetings a month after signal-based routing in n8n, one client", "from": "5", "to": "14" },
+    { "where": "Agentic", "claim": "Cost per meeting for that client", "from": "$840", "to": "$14" },
+    { "where": "Lumos", "claim": "LinkedIn connections managed across 43 campaigns, reply rate on all replies", "from": "", "to": "105K+ at 28.1%" },
+    { "where": "Lumos", "claim": "B2B clients across 47 industries", "from": "", "to": "200+" },
+    { "where": "Cleverly", "claim": "Outbound campaigns audited, and the audit framework they were graded on", "from": "", "to": "200+" },
+    { "where": "Cleverly", "claim": "Meetings booked for clients", "from": "", "to": "4,500+" },
+    { "where": "Cleverly", "claim": "Clay Top 1% user, contacts enriched", "from": "", "to": "5M+" }
+  ]
+}

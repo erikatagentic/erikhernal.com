@@ -1,0 +1,10 @@
+{
+  "note": "Clients of Lumos, the agency Erik co-owns. Each quote is word for word from the client's video on the Lumos YouTube channel, published Feb 12, 2026, with the timestamp where it's said.",
+  "rows": [
+    { "name": "John Jaufmann", "title": "President", "company": "My Healthcare Executive", "video": "x2vrEnyYygc", "at": "3:49", "quote": "I don't do a lot of testimonials, but your service I agreed to do this because I believe I'm getting what I'm paying for. I believe that the returns are actually there..." },
+    { "name": "Michael Valdez", "title": "Head of Sales and Marketing", "company": "Activate OS", "video": "87ejuDDOGP4", "at": "2:34", "quote": "On average we were able to book a few meetings a week across all the platforms that we were running. The leads were premium, like it was our exact ICP." },
+    { "name": "Kai Brunner", "title": "Co-founder and CEO", "company": "Sig2 Labs", "video": "nrG3hLy8PoY", "at": "1:54", "quote": "We were able to go from a sporadic outcome where sometimes we'd have a good week, other times we'd have a quiet week. And what really stood out is that Lumos creates this predictable cadence." },
+    { "name": "Clifton Jackson", "title": "Founder", "company": "FireVibe Web Design", "video": "lS4K37CI5iI", "at": "2:48", "quote": "We've already closed two clients... and it's only been about a month." },
+    { "name": "UNUM team", "title": "", "company": "UNUM", "video": "XP2EGWDTdv8", "at": "2:04", "quote": "I would just say you helped us get in front of the right people with just clear messaging that's not too salesy." }
+  ]
+}

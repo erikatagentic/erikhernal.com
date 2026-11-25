@@ -1,0 +1,118 @@
+---
+import '@fontsource-variable/source-serif-4/opsz.css';
+import '@fontsource-variable/archivo-narrow';
+import '@fontsource/nanum-pen-script/latin-400.css';
+import '../styles/notebook.css';
+
+interface Props {
+  title: string;
+  description: string;
+  page: string | number;
+}
+
+const { title, description, page } = Astro.props;
+const indexLinks = [
+  { href: '/#entries', label: 'Entries' },
+  { href: '/#record', label: 'Record' },
+  { href: '/#clients', label: 'Clients' },
+  { href: '/erik-hernal-resume.pdf', label: 'Resume' },
+  { href: '/#contact', label: 'Contact' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      try {
+        if (
+          'IntersectionObserver' in window &&
+          !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
+          document.documentElement.classList.add('strike-anim');
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to the page</a>
+    <div class="page">
+      <div class="holes" aria-hidden="true"><i></i><i></i><i></i></div>
+      <header class="form">
+        <div>Name<b>Erik Hernal</b></div>
+        <div>Role<b>GTM Engineer</b></div>
+        <div>Notebook<b>2019 to now</b></div>
+        <div>Page<b>{page}</b></div>
+      </header>
+      <nav class="index" aria-label="Notebook index">
+        {indexLinks.map((link) => <a href={link.href}>{link.label}</a>)}
+      </nav>
+      <main id="main" tabindex="-1">
+        <slot />
+      </main>
+    </div>
+    <script is:inline>
+      (function () {
+        var visited = [];
+        try {
+          var raw = window.localStorage.getItem('eh-visited');
+          var parsed = raw ? JSON.parse(raw) : [];
+          if (Array.isArray(parsed)) visited = parsed;
+        } catch (e) {}
+        try {
+          var links = document.querySelectorAll('a[data-slug]');
+          for (var i = 0; i < links.length; i++) {
+            if (visited.indexOf(links[i].getAttribute('data-slug')) !== -1) {
+              links[i].classList.add('is-visited');
+            }
+          }
+        } catch (e) {}
+
+        var root = document.documentElement;
+        if (!root.classList.contains('strike-anim')) return;
+        var strikes = document.querySelectorAll('.struck');
+        function draw(el) {
+          el.classList.remove('is-drawn');
+          void el.offsetWidth;
+          el.classList.add('is-drawn');
+        }
+        try {
+          var io = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-drawn');
+                  io.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.6 }
+          );
+          strikes.forEach(function (el) {
+            io.observe(el);
+            var owner = el.closest('[data-entry]') || el;
+            if (owner.getAttribute('data-strike-bound')) return;
+            owner.setAttribute('data-strike-bound', '1');
+            function redraw() {
+              owner.querySelectorAll('.struck').forEach(draw);
+            }
+            owner.addEventListener('mouseenter', redraw);
+            owner.addEventListener('focusin', redraw);
+          });
+        } catch (e) {
+          root.classList.remove('strike-anim');
+        }
+      })();
+    </script>
+  </body>
+</html>

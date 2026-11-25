@@ -1,0 +1,89 @@
+{
+  "snapshot_at": "2026-09-04T13:38:33Z",
+  "since": "2026-07-20",
+  "tables": {
+    "total": 428,
+    "since": 14,
+    "named": [
+      {
+        "name": "AlphaForge Foundations - (FETE)",
+        "createdAt": "2026-07-27"
+      },
+      {
+        "name": "Champion Job Signal",
+        "createdAt": "2026-08-14"
+      },
+      {
+        "name": "suppression-master-seed",
+        "createdAt": "2026-08-16"
+      },
+      {
+        "name": "incoming-20",
+        "createdAt": "2026-08-16"
+      },
+      {
+        "name": "Job change Events from Job Signal table",
+        "createdAt": "2026-08-16"
+      },
+      {
+        "name": "Job change Events from AlphaForge Foundations - (FETE) (16 August 2026)",
+        "createdAt": "2026-08-16"
+      },
+      {
+        "name": "watchlist-30",
+        "createdAt": "2026-08-19"
+      },
+      {
+        "name": "Job posting Events from watchlist-30 (19 August 2026)",
+        "createdAt": "2026-08-19"
+      },
+      {
+        "name": "News & fundraising Events from watchlist-30 (19 August 2026)",
+        "createdAt": "2026-08-19"
+      },
+      {
+        "name": "Headcount Run History",
+        "createdAt": "2026-08-20"
+      },
+      {
+        "name": "Headcount Change Signals",
+        "createdAt": "2026-08-20"
+      },
+      {
+        "name": "Copy of Custom Table",
+        "createdAt": "2026-08-23"
+      },
+      {
+        "name": "Guesser Proof 36",
+        "createdAt": "2026-08-23"
+      },
+      {
+        "name": "clay-import-50",
+        "createdAt": "2026-08-24"
+      }
+    ]
+  },
+  "audiences": {
+    "total": 14,
+    "alphaforge": 14,
+    "company_records_total": 15132,
+    "records": {
+      "AlphaForge recut - Unmeasured": 17,
+      "AlphaForge recut - No channel of their own": 359,
+      "AlphaForge recut - Transacting but silent": 255,
+      "AlphaForge recut - Someone else owns their diners": 1049,
+      "AlphaForge recut - Paying, not using it": 652,
+      "AlphaForge P9 - Slice 18 (drafted, not sent)": 39,
+      "AlphaForge P8 - S3 POS-adjacent": 982,
+      "AlphaForge P8 - S2 Renting": 360,
+      "AlphaForge P8 - S1 Displacement": 990,
+      "AlphaForge P7: Owner.com TAM (qualified)": 0,
+      "S1 HOT: hiring GTM/sales roles now (sync to CRM)": 18,
+      "S3 Outbound & lead-gen agencies (10-500, sales>=2)": 1194,
+      "S2 Mid-market sales orgs (200-2000, sales>=10)": 1504,
+      "S1 Scaling software teams (50-500, sales>=3)": 4047
+    }
+  },
+  "credits_balance": 38208.3,
+  "method": "clay CLI, read-only: tables list --limit 100 (paged on cursor), audiences list --entity-type companies, audiences records search-count per audience, credits, whoami"
+}

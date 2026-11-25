@@ -1,0 +1,631 @@
+---
+import { getCollection, render } from 'astro:content';
+import Notebook from '../../layouts/Notebook.astro';
+import Struck from '../../components/Struck.astro';
+import Slip from '../../components/Slip.astro';
+import Receipt from '../../components/Receipt.astro';
+import Entry from '../../components/Entry.astro';
+import { formatDate, isoDay } from '../../lib/dates';
+import { BUILT_PAGE } from '../../lib/pages';
+import artifactsData from '../../data/artifacts.json';
+import receipts from '../../data/receipts.json';
+
+export async function getStaticPaths() {
+  const work = (await getCollection('work')).sort((a, b) => a.data.page - b.data.page);
+  return work.map((entry, i) => ({
+    params: { slug: entry.data.slug },
+    props: { entry, prev: work[i - 1], next: work[i + 1] },
+  }));
+}
+
+type Artifact = {
+  title: string;
+  note: string;
+  source: string;
+  total: number;
+  shown: number;
+  lines: string[];
+};
+
+const { entry, prev, next } = Astro.props;
+const data = entry.data;
+const { Content } = await render(entry);
+const artifacts = artifactsData as Record<string, Artifact>;
+
+const emails = await getCollection('emails');
+const email = emails.find((e) => e.data.links_to === data.slug);
+const EmailBody = email ? (await render(email)).Content : null;
+const emailReceipt = email
+  ? receipts.find((r) => r.position === `${email.data.position}/4`)
+  : undefined;
+
+const dateText = formatDate(data.date);
+const isoDate = isoDay(data.date);
+const isAlphaForge = data.cohort.startsWith('AlphaForge');
+
+const encodeSubject = (s: string) =>
+  encodeURIComponent(s).replace(
+    /['()*!~]/g,
+    (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase(),
+  );
+const replyHref = `mailto:erik@erikhernal.com?subject=${encodeSubject('Re: ' + data.title)}`;
+const lineCount = (a: Artifact) =>
+  a.shown === a.total ? `${a.total} lines, the whole file` : `${a.shown} of ${a.total} lines`;
+
+// Long excerpts show their first lines; a native toggle opens the rest.
+const EXCERPT_LINES = 12;
+const showAllLabel = (a: Artifact) =>
+  a.shown === a.total ? `Show all ${a.total} lines` : `Show all ${a.shown} excerpted lines`;
+
+// Splits a title so its last word can stay on one line with the page ref.
+const splitLast = (title: string) => {
+  const at = title.lastIndexOf(' ');
+  return at < 0 ? ['', title] : [title.slice(0, at + 1), title.slice(at + 1)];
+};
+---
+
+<Notebook title={`${data.title} | Erik Hernal`} description={data.one_line} page={data.page}>
+  <article class="case">
+    <header class="case-head" data-entry>
+      <h1 class="case-title">{data.title}</h1>
+      <p class="case-meta label">
+        {data.cohort} · <time datetime={isoDate}>{dateText}</time>
+        <span class="pg case-meta-pg">p. {data.page}</span>
+      </p>
+      {
+        isAlphaForge && (
+          <p class="case-cohort">
+            AlphaForge is Clay's GTM engineering cohort. Each numbered prompt is a build with a
+            deadline and a public write-up, so the work below was done in the open and graded by
+            people who do this for a living.
+          </p>
+        )
+      }
+      <p class="lede">{data.one_line}</p>
+      <div class="case-figure">
+        <p class="date" aria-hidden="true"><span class="pg">p. {data.page}</span></p>
+        <Struck was={data.struck.was} now={data.struck.now} label={data.struck.label} />
+      </div>
+      <p class="fast">fast version: {data.fast}</p>
+      <p class="case-source small">source: {data.number.source}</p>
+    </header>
+
+    <div class="case-body">
+      <div class="prose">
+        <Content />
+      </div>
+
+      <section class="case-section case-taped" aria-labelledby="taped-h">
+      <h2 id="taped-h">Taped in</h2>
+      <ul class="taped">
+        {
+          data.receipts.map((r, i) => {
+            const art = artifacts[r.file];
+            return (
+              <Slip as="li" tilt={i % 2 === 0 ? 'left' : 'right'} class="taped-slip">
+                <p class="taped-file">{r.file}</p>
+                <p class="taped-count">{r.count}</p>
+                <p class="taped-proves">{r.proves}</p>
+                {art && (
+                  <div class="taped-art">
+                    <p class="taped-art-title">{art.title}</p>
+                    <pre class="taped-lines">{art.lines.slice(0, EXCERPT_LINES).join('\n')}</pre>
+                    {art.lines.length > EXCERPT_LINES && (
+                      <details class="taped-more">
+                        <summary>
+                          <span class="more-closed">{showAllLabel(art)}</span>
+                          <span class="more-open">Show fewer lines</span>
+                        </summary>
+                        <pre class="taped-lines taped-lines--rest">{art.lines.slice(EXCERPT_LINES).join('\n')}</pre>
+                      </details>
+                    )}
+                    <p class="taped-art-note">
+                      {lineCount(art)}. {art.note}
+                    </p>
+                  </div>
+                )}
+              </Slip>
+            );
+          })
+        }
+      </ul>
+      </section>
+    </div>
+
+    {
+      data.links.length > 0 && (
+        <section class="case-section" aria-labelledby="links-h">
+          <h2 id="links-h">Links</h2>
+          <ul class="case-links">
+            {data.links.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      email && EmailBody && (
+        <section class="case-section" aria-labelledby="email-h">
+          <h2 id="email-h">The email that points here</h2>
+          <div class="email-pair">
+            <Slip tilt="right" class="email-slip">
+              <p class="email-head">
+                <span class="email-subject">Subject: {email.data.subject}</span>
+                <span class="label">
+                  Email {email.data.position} of 4, day {email.data.delay_days}
+                </span>
+              </p>
+              <div class="email-body">
+                <EmailBody />
+              </div>
+            </Slip>
+            {emailReceipt && <Receipt receipt={emailReceipt} />}
+          </div>
+        </section>
+      )
+    }
+
+    <footer class="case-foot">
+      <p class="actions case-reply">
+        <a href={replyHref}>Reply about this one</a>
+      </p>
+      <nav class="case-pager" aria-label="Other pages">
+        {
+          prev && (
+            <p class="pager-prev">
+              <span class="pager-lead">Previous:</span>{' '}
+              <a href={`/work/${prev.data.slug}/`} data-slug={prev.data.slug}>
+                {splitLast(prev.data.title)[0]}<span class="keep"
+                  >{splitLast(prev.data.title)[1]}<span class="keep-tick"></span><span class="pg"
+                    >p. {prev.data.page}</span
+                  ></span
+                >
+              </a>
+            </p>
+          )
+        }
+        <p class="case-back"><a href="/">Back to the index</a></p>
+      </nav>
+      <section class="next-entry" aria-label={next ? 'Next entry' : 'Next page'}>
+        {
+          next ? (
+            <Entry
+              variant="next"
+              slug={next.data.slug}
+              page={next.data.page}
+              date={next.data.date}
+              title={next.data.title}
+              struck={next.data.struck}
+              one_line={next.data.one_line}
+              fast={next.data.fast}
+            />
+          ) : (
+            <h2 class="next-built-title">
+              <span class="next-built-lead">Next:</span>{' '}
+              <a href="/built/">How this notebook is made</a>{' '}
+              <span class="pg">p. {BUILT_PAGE}</span>
+            </h2>
+          )
+        }
+      </section>
+    </footer>
+  </article>
+  <script is:inline define:vars={{ slug: data.slug }}>
+    try {
+      var key = 'eh-visited';
+      var list = [];
+      try {
+        var parsed = JSON.parse(window.localStorage.getItem(key) || '[]');
+        if (Array.isArray(parsed)) list = parsed;
+      } catch (e) {}
+      if (list.indexOf(slug) === -1) list.push(slug);
+      window.localStorage.setItem(key, JSON.stringify(list));
+    } catch (e) {}
+  </script>
+</Notebook>
+
+<style is:global>
+  .case-title {
+    max-width: 22ch;
+  }
+
+  .case-meta {
+    margin: 24px 0 0;
+  }
+
+  /* on phones the page ref rides on the meta line; at desktop it's in the margin */
+  .case-meta-pg {
+    display: none;
+    margin-left: 8px;
+    font: 400 22px/1 var(--pen);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--red);
+  }
+
+  .case-figure {
+    position: relative;
+    margin-top: 32px;
+  }
+
+  .case-figure .date {
+    top: 2px;
+    margin: 0;
+  }
+
+  .case-figure .date .pg {
+    margin-top: 0;
+  }
+
+  .case-figure .struck {
+    margin-top: 0;
+  }
+
+  .case-cohort {
+    max-width: 62ch;
+    font-size: 16px;
+    color: var(--ink-soft);
+  }
+
+  .case .lede {
+    max-width: 58ch;
+  }
+
+  .case-source {
+    margin-top: 24px;
+    max-width: 62ch;
+    overflow-wrap: anywhere;
+  }
+
+  .case-body {
+    margin-top: 48px;
+  }
+
+  .prose {
+    max-width: 64ch;
+  }
+
+  .prose h2 {
+    margin: 48px 0 0;
+    font-size: 28px;
+  }
+
+  .prose p {
+    margin-top: 16px;
+  }
+
+  .shot {
+    position: relative;
+    margin: 40px 0 16px;
+    padding: 12px 12px 14px;
+    background: var(--slip);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.08),
+      0 12px 28px -14px rgba(20, 30, 60, 0.45);
+    transform: rotate(-0.8deg);
+  }
+
+  .shot::before,
+  .shot::after {
+    content: '';
+    position: absolute;
+    top: -12px;
+    width: 96px;
+    height: 26px;
+    background: var(--tape);
+  }
+
+  .shot::before {
+    left: 24px;
+    transform: rotate(-6deg);
+  }
+
+  .shot::after {
+    right: 24px;
+    transform: rotate(5deg);
+  }
+
+  .shot img {
+    display: block;
+    width: 100%;
+  }
+
+  .shot figcaption {
+    margin-top: 10px;
+    font: 500 14px/1.5 var(--narrow);
+    color: var(--ink-soft);
+  }
+
+  .case-section {
+    margin-top: 96px;
+  }
+
+  .case-section > h2 {
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .taped {
+    display: grid;
+    gap: 40px;
+    max-width: 820px;
+    margin: 40px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .taped-file {
+    margin: 0;
+    font: 600 14px/1.4 var(--mono);
+    overflow-wrap: anywhere;
+  }
+
+  .taped-count {
+    margin: 6px 0 0;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .taped-proves {
+    margin: 4px 0 0;
+    font: 400 16px/1.5 var(--serif);
+  }
+
+  .taped-art {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dotted var(--grid-strong);
+  }
+
+  .taped-art-title {
+    margin: 0;
+    font: 700 13px/1.3 var(--narrow);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .taped-lines {
+    max-width: 100%;
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    background: rgba(207, 219, 230, 0.28);
+    font: 400 12.5px/1.6 var(--mono);
+    color: var(--ink);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    tab-size: 2;
+  }
+
+  .taped-more {
+    margin: 0;
+  }
+
+  .taped-more summary {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 0;
+    font: 400 22px/1.1 var(--pen);
+    color: var(--red);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .taped-more summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .taped-more summary::before {
+    content: '+ ';
+  }
+
+  .taped-more[open] summary::before {
+    content: '- ';
+  }
+
+  .taped-more summary:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--red);
+  }
+
+  .more-open,
+  .taped-more[open] .more-closed {
+    display: none;
+  }
+
+  .taped-more[open] .more-open {
+    display: inline;
+  }
+
+  .taped-lines--rest {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .taped-art-note {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .case-links {
+    margin: 24px 0 0;
+    padding-left: 20px;
+  }
+
+  .email-pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+    gap: 40px;
+    align-items: start;
+    max-width: 920px;
+    margin-top: 40px;
+  }
+
+  .email-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 16px;
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px dotted var(--grid-strong);
+  }
+
+  .email-subject {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .email-body {
+    font: 400 17px/1.55 var(--serif);
+  }
+
+  .email-body p {
+    margin: 14px 0 0;
+  }
+
+  .case-foot {
+    margin-top: 96px;
+    padding-top: 24px;
+    border-top: 2px solid var(--ink);
+  }
+
+  .case-reply {
+    margin-top: 0;
+  }
+
+  .case-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px 40px;
+    margin-top: 40px;
+  }
+
+  .pager-prev {
+    margin: 0;
+    max-width: 40ch;
+    font: 420 20px/1.3 var(--serif);
+  }
+
+  .pager-lead,
+  .next-built-lead {
+    font: 700 15px/1 var(--narrow);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    vertical-align: 0.15em;
+  }
+
+  .pager-prev a,
+  .next-built-title a {
+    text-decoration: none;
+  }
+
+  .pager-prev a:hover,
+  .next-built-title a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--ink-soft);
+  }
+
+  .pager-prev .pg,
+  .next-built-title .pg {
+    margin-left: 4px;
+    font: 400 24px/1 var(--pen);
+    color: var(--red);
+    white-space: nowrap;
+  }
+
+  .case-back {
+    margin: 0;
+    font: 700 15px/1 var(--narrow);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .next-entry {
+    margin-top: 56px;
+    padding: 24px 0 8px;
+    border-top: 1px solid var(--grid-strong);
+  }
+
+  .next-built-title {
+    margin: 0;
+    font: 420 28px/1.2 var(--serif);
+    letter-spacing: -0.02em;
+  }
+
+  .next-built-lead {
+    vertical-align: 0.3em;
+  }
+
+  @media (max-width: 900px) {
+    .email-pair {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .case-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+      gap: 40px;
+      align-items: start;
+    }
+
+    .case-taped {
+      margin: 0;
+      padding-top: 4px;
+    }
+
+    .case-taped > h2 {
+      font-size: 24px;
+    }
+
+    .case-taped .taped {
+      gap: 32px;
+      margin-top: 32px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .case-figure {
+      margin-top: 28px;
+    }
+
+    .case-figure .date {
+      display: none;
+    }
+
+    .case-meta-pg {
+      display: inline;
+    }
+
+    .next-built-title {
+      font-size: 24px;
+    }
+
+    .prose h2 {
+      font-size: 24px;
+    }
+
+    .shot {
+      transform: none;
+    }
+
+    .case-section,
+    .case-foot {
+      margin-top: 72px;
+    }
+
+    .case-pager {
+      flex-direction: column;
+      align-items: start;
+    }
+  }
+</style>

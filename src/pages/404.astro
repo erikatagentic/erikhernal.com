@@ -1,0 +1,21 @@
+---
+import Notebook from '../layouts/Notebook.astro';
+---
+
+<Notebook
+  title="Page not found | Erik Hernal"
+  description="The link you followed doesn't go anywhere on this site."
+  page="torn"
+>
+  <div class="torn">
+    <h1>This page was torn out.</h1>
+    <p class="lede">The link you followed doesn't go anywhere on this site.</p>
+    <p class="actions"><a href="/">Back to the index</a></p>
+  </div>
+</Notebook>
+
+<style is:global>
+  .torn {
+    min-height: 50vh;
+  }
+</style>

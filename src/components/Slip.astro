@@ -1,0 +1,106 @@
+---
+interface Props {
+  title?: string;
+  tilt?: 'left' | 'right' | 'none' | 'custom';
+  class?: string;
+  as?: 'div' | 'aside' | 'figure' | 'li' | 'article';
+  // with tilt="custom": rotation in degrees, and where each tape strip sits
+  angle?: number;
+  tapes?: { left: number; leftTurn: number; right: number; rightTurn: number };
+}
+
+const { title, tilt = 'right', class: className, as: Tag = 'div', angle = 0, tapes } = Astro.props;
+const style =
+  tilt === 'custom'
+    ? [
+        `--tilt: ${angle}deg`,
+        tapes && `--tape-a-x: ${tapes.left}px; --tape-a-r: ${tapes.leftTurn}deg`,
+        tapes && `--tape-b-x: ${tapes.right}px; --tape-b-r: ${tapes.rightTurn}deg`,
+      ]
+        .filter(Boolean)
+        .join('; ')
+    : undefined;
+---
+
+<Tag class:list={['slip', `slip--${tilt}`, className]} style={style}>
+  {title && <h3 class="slip-title">{title}</h3>}
+  <slot />
+</Tag>
+
+<style>
+  .slip {
+    position: relative;
+    min-width: 0;
+    max-width: 100%;
+    margin: 8px 0 0;
+    padding: 20px 22px 18px;
+    background: var(--slip);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.08),
+      0 10px 24px -14px rgba(20, 30, 60, 0.4);
+    font: 500 14px/1.5 var(--narrow);
+    color: var(--ink);
+  }
+
+  /* the top tape rises about 22px above the slip, so clear the line above it */
+  :global(p) + .slip {
+    margin-top: 40px;
+  }
+
+  .slip--right {
+    transform: rotate(1.2deg);
+  }
+
+  .slip--left {
+    transform: rotate(-0.9deg);
+  }
+
+  .slip--custom {
+    transform: rotate(var(--tilt, 0deg));
+  }
+
+  .slip::before,
+  .slip::after {
+    content: '';
+    position: absolute;
+    top: -12px;
+    width: 84px;
+    height: 26px;
+    background: var(--tape);
+    pointer-events: none;
+  }
+
+  .slip::before {
+    left: var(--tape-a-x, -18px);
+    transform: rotate(var(--tape-a-r, -14deg));
+  }
+
+  .slip::after {
+    right: var(--tape-b-x, -18px);
+    transform: rotate(var(--tape-b-r, 12deg));
+  }
+
+  .slip-title {
+    margin: 0 0 10px;
+    font: 700 13px/1.3 var(--narrow);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 720px) {
+    .slip--right,
+    .slip--left,
+    .slip--custom {
+      transform: none;
+    }
+
+    .slip::before {
+      left: max(-8px, var(--tape-a-x, -8px));
+    }
+
+    .slip::after {
+      right: max(-8px, var(--tape-b-x, -8px));
+    }
+  }
+</style>
