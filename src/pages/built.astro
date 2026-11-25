@@ -6,10 +6,13 @@ import receipts from '../data/receipts.json';
 import clay from '../data/clay-snapshot.json';
 import { formatDate, formatDateTimeUTC } from '../lib/dates';
 import { BUILT_PAGE } from '../lib/pages';
+import { loadShowcases } from '../lib/showcases.mjs';
+import savedShowcases from '../data/showcases.json';
 
 const firstReceipt = receipts[0];
 const nf = new Intl.NumberFormat('en-US');
 const snapshotText = formatDateTimeUTC(clay.snapshot_at);
+const { repos: showcases } = await loadShowcases({ fallback: savedShowcases });
 
 const stats = [
   { value: nf.format(clay.tables.since), label: `tables built since ${formatDate(clay.since)}` },
@@ -102,6 +105,24 @@ const stats = [
         domain into <a href="https://heyagentic.ai/forge">heyagentic.ai/forge</a> and it researches
         the company and writes the cold email that company should be getting.
       </p>
+      {
+        showcases.length > 0 && (
+          <>
+            <p class="built-measure">
+              And a few you can run on your own machine. Each one is a public repo, and its README
+              gets it going.
+            </p>
+            <ul class="showcase-list">
+              {showcases.map((r) => (
+                <li>
+                  <a href={r.url}>{r.name}</a>
+                  {r.description && <span>{r.description}</span>}
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
     </section>
 
     <p class="actions built-back"><a href="/">Back to the index</a></p>
@@ -212,6 +233,31 @@ const stats = [
     overflow-wrap: anywhere;
   }
 
+  .showcase-list {
+    max-width: 64ch;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .showcase-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 14ch) minmax(0, 1fr);
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--grid-strong);
+  }
+
+  .showcase-list a {
+    font-family: var(--mono);
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+
+  .showcase-list span {
+    color: var(--ink-soft);
+  }
+
   .built-back {
     margin-top: 96px;
   }
@@ -223,6 +269,11 @@ const stats = [
   }
 
   @media (max-width: 720px) {
+    .showcase-list li {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px;
+    }
+
     .built-prose p:first-child {
       font-size: 18px;
     }
