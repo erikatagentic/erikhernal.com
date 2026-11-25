@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { pickShowcases, loadShowcases } from '../src/lib/showcases.mjs';
+import { readFileSync } from 'node:fs';
+import { pickShowcases, loadShowcases, vetShowcases, BANNED } from '../src/lib/showcases.mjs';
 
 const repo = (over = {}) => ({
   name: 'list-gate',
@@ -128,4 +129,19 @@ test('says why on every fallback', async () => {
   assert.match(lines[0], /403/);
   assert.match(lines[1], /offline/);
   assert.match(lines[2], /list-gate.*exclamation mark/);
+});
+
+test('the copy check sees what a visitor sees: spacing and comment markers do not hide words', async () => {
+  const words = ['deep dive', 'robust'];
+  const sneaky = ['A deep  dive into lists.', 'A deep dive into lists.', 'Lists <!-- robust --> done.', 'Done <!-- yes! -->'];
+  for (const description of sneaky) {
+    const problems = vetShowcases([{ name: 'list-gate', description }], words);
+    assert.ok(problems.length > 0, description);
+  }
+});
+
+test('the saved copy passes the same checks as live text', () => {
+  const saved = JSON.parse(readFileSync(new URL('../src/data/showcases.json', import.meta.url), 'utf8'));
+  assert.ok(Array.isArray(saved));
+  assert.deepEqual(vetShowcases(saved, BANNED), []);
 });

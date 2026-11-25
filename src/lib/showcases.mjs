@@ -6,7 +6,8 @@
 //
 // Vercel's build runs none of the site's CI checks, so every live name and
 // description goes through the same copy and privacy checks here. Any hit, and
-// the page uses the saved copy, which PR CI already checked.
+// the page uses the saved copy, which scripts/showcases.test.mjs puts through the
+// same checks in PR CI.
 import { lintText } from '../../scripts/lint-copy.mjs';
 import { scanText } from '../../scripts/check-private.mjs';
 import banned from '../../scripts/banned-words.json' with { type: 'json' };
@@ -46,7 +47,10 @@ export function vetShowcases(repos, words) {
   const problems = [];
   for (const r of repos) {
     const text = `${r.name}\n${r.description}`;
-    for (const i of lintText(text, words)) problems.push(`${r.name}: ${i.rule} "${i.match}"`);
+    // What a visitor sees: runs of spaces (non-breaking ones too) collapse to one,
+    // and Astro escapes "<", so comment markers show as text and must not hide words.
+    const visible = text.replace(/[^\S\n]+/g, ' ').replace(/</g, '&lt;');
+    for (const i of lintText(visible, words)) problems.push(`${r.name}: ${i.rule} "${i.match}"`);
     for (const h of scanText(text)) problems.push(`${r.name}: ${h.rule} "${h.match}"`);
   }
   return problems;
