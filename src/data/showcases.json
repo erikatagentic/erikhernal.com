@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "name": "list-gate",
+    "description": "A check that refuses to ship a bad lead list.",
+    "url": "https://github.com/erikatagentic/list-gate",
+    "language": "JavaScript",
+    "created_at": "2026-11-25T23:28:50Z"
+  },
+  {
+    "name": "scrape-ladder",
+    "description": "Scrapes a public page by trying the cheapest polite method first.",
+    "url": "https://github.com/erikatagentic/scrape-ladder",
+    "language": "Python",
+    "created_at": "2026-11-25T23:29:06Z"
+  },
+  {
+    "name": "agent-guardrails",
+    "description": "Five checks that stop a coding agent's risky moves before they run.",
+    "url": "https://github.com/erikatagentic/agent-guardrails",
+    "language": "JavaScript",
+    "created_at": "2026-11-25T23:29:14Z"
+  },
+  {
+    "name": "reply-sorter",
+    "description": "Sorts cold-email replies and counts the yeses a person wrote.",
+    "url": "https://github.com/erikatagentic/reply-sorter",
+    "language": "JavaScript",
+    "created_at": "2026-11-25T23:29:23Z"
+  },
+  {
+    "name": "formd-signals",
+    "description": "Finds companies that just raised money, from free SEC filings.",
+    "url": "https://github.com/erikatagentic/formd-signals",
+    "language": "JavaScript",
+    "created_at": "2026-11-26T01:17:40Z"
+  }
+]
