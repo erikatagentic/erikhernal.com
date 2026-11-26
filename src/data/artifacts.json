@@ -98,10 +98,10 @@
       "5. bounce senders are recognised"
     ]
   },
-  "scores/replies-c339-2026-08-23.json": {
+  "reply-scores-2026-08-23.json": {
     "title": "Every reply on that campaign, with the label it was given and why",
     "note": "Addresses reduced to their domain. The label and the reason are the classifier's own. Organization names in auto-replies replaced with a description.",
-    "source": "replies-c339-2026-08-23.json",
+    "source": "reply-scores-2026-08-23.json",
     "total": 31,
     "shown": 31,
     "lines": [
